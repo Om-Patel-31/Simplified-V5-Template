@@ -31,8 +31,8 @@ double lastRightRotations = 0.0;
 // Update robot position using motor encoders and inertial sensor
 void updateOdometry() {
   // Read current motor rotations
-  double leftRotations = leftFrontMotor.rotation(vex::rotationUnits::rev);
-  double rightRotations = rightFrontMotor.rotation(vex::rotationUnits::rev);
+  double leftRotations = leftFrontMotor.position(vex::rotationUnits::rev);
+  double rightRotations = rightFrontMotor.position(vex::rotationUnits::rev);
   
   // Calculate how far each wheel traveled since last update
   double leftDelta = leftRotations - lastLeftRotations;
@@ -63,8 +63,8 @@ void resetOdometry(double x, double y, double heading) {
   robotX = x;
   robotY = y;
   robotHeading = heading;
-  lastLeftRotations = leftFrontMotor.rotation(vex::rotationUnits::rev);
-  lastRightRotations = rightFrontMotor.rotation(vex::rotationUnits::rev);
+  lastLeftRotations = leftFrontMotor.position(vex::rotationUnits::rev);
+  lastRightRotations = rightFrontMotor.position(vex::rotationUnits::rev);
 }
 
 // ============================================================================
