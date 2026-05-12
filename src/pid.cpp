@@ -7,58 +7,50 @@
 #include <cmath>
 
 #include "config.h"
+#include "pid.h"
 
 // ============================================================================
-// PID CONTROLLER CLASS
+// PID CONTROLLER IMPLEMENTATION
 // ============================================================================
 
-class PID {
-private:
-  double kP, kI, kD, tolerance;
-  double integralSum = 0.0;
-  double lastError = 0.0;
-  bool firstCall = true;
+PID::PID(double p, double i, double d, double tol) 
+  : kP(p), kI(i), kD(d), tolerance(tol) {}
+
+// Main PID calculation - returns motor power (-100 to 100)
+double PID::calculate(double error, double deltaTime) {
+  // Proportional term: respond to current error
+  double P = kP * error;
   
-public:
-  PID(double p, double i, double d, double tol) 
-    : kP(p), kI(i), kD(d), tolerance(tol) {}
+  // Integral term: accumulate error over time
+  integralSum += error * deltaTime;
+  if (integralSum > 50.0) integralSum = 50.0;      // Anti-windup
+  if (integralSum < -50.0) integralSum = -50.0;
+  double I = kI * integralSum;
   
-  // Main PID calculation - returns motor power (-100 to 100)
-  double calculate(double error, double deltaTime) {
-    // Proportional term: respond to current error
-    double P = kP * error;
-    
-    // Integral term: accumulate error over time
-    integralSum += error * deltaTime;
-    if (integralSum > 50.0) integralSum = 50.0;      // Anti-windup
-    if (integralSum < -50.0) integralSum = -50.0;
-    double I = kI * integralSum;
-    
-    // Derivative term: smooth out response
-    double D = 0.0;
-    if (!firstCall) {
-      D = kD * (error - lastError) / deltaTime;
-    }
-    firstCall = false;
-    lastError = error;
-    
-    // Combine all terms
-    double motorPower = P + I + D;
-    
-    // Clamp to valid motor range
-    if (motorPower > MAX_MOTOR_POWER) motorPower = MAX_MOTOR_POWER;
-    if (motorPower < -MAX_MOTOR_POWER) motorPower = -MAX_MOTOR_POWER;
-    
-    return motorPower;
+  // Derivative term: smooth out response
+  double D = 0.0;
+  if (!firstCall) {
+    D = kD * (error - lastError) / deltaTime;
   }
+  firstCall = false;
+  lastError = error;
   
-  void reset() {
-    integralSum = 0.0;
-    lastError = 0.0;
-    firstCall = true;
-  }
+  // Combine all terms
+  double motorPower = P + I + D;
   
-  bool isFinished(double error) {
-    return std::abs(error) < tolerance;
-  }
-};
+  // Clamp to valid motor range
+  if (motorPower > MAX_MOTOR_POWER) motorPower = MAX_MOTOR_POWER;
+  if (motorPower < -MAX_MOTOR_POWER) motorPower = -MAX_MOTOR_POWER;
+  
+  return motorPower;
+}
+
+void PID::reset() {
+  integralSum = 0.0;
+  lastError = 0.0;
+  firstCall = true;
+}
+
+bool PID::isFinished(double error) {
+  return std::abs(error) < tolerance;
+}

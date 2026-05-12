@@ -7,7 +7,7 @@
 #include <cmath>
 
 #include "config.h"
-#include "pid.cpp"
+#include "pid.h"
 
 vex::motor leftFrontMotor(vex::PORT1, vex::gearSetting::ratio18_1, false);
 vex::motor leftBackMotor(vex::PORT2, vex::gearSetting::ratio18_1, false);
