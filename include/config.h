@@ -28,7 +28,7 @@ constexpr double TURN_kI = 0.1;
 constexpr double TURN_kD = 0.05;
 constexpr double DRIVE_TOLERANCE = 1.0;
 constexpr double TURN_TOLERANCE = 2.0;
-constexpr int TIMEOUT_MS = 4000;
+constexpr int TIMEOUT_MS = 120000;
 constexpr int CONTROL_LOOP_MS = 20;
 constexpr double MAX_MOTOR_POWER = 100.0;
 
@@ -37,6 +37,11 @@ void turnToHeading(double targetHeading, double maxPower);
 void stopDrivetrain();
 void updateOdometry();
 void resetOdometry(double x, double y, double heading);
+
+// Additional helpers used by higher-level autonomous routines
+void spinDrivetrainSeconds(double seconds, double power);
+void turnByDegrees(double deltaDegrees, double maxPower);
+void rotateInPlaceDegrees(double degrees, double maxPower);
 
 void autonomousLeft();
 void autonomousRight();
